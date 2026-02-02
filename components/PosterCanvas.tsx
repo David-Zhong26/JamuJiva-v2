@@ -54,10 +54,6 @@ const PosterCanvas: React.FC<PosterCanvasProps> = ({
           >
             HERITAGE MEETS HUSTLE
           </motion.div>
-          
-          <div className="text-white/40 text-[10px] uppercase font-black tracking-widest hidden md:block">
-            Auto-generating new mood...
-          </div>
         </div>
 
         <motion.div style={{ y: textY, opacity }} className="max-w-4xl">

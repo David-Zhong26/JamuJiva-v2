@@ -2,29 +2,67 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
 
-const Callout: React.FC<{ 
-  title: string; 
-  description: string; 
-  x: string; 
-  y: string; 
-  progress: any; 
+interface CalloutProps {
+  title: string;
+  description: string;
+  x: string;
+  y: string;
+  progress: any;
   range: [number, number];
   alignment: 'left' | 'right';
-}> = ({ title, description, x, y, progress, range, alignment }) => {
-  const opacity = useTransform(progress, range, [0, 1, 1, 0]);
-  const translateX = useTransform(progress, range, [alignment === 'left' ? -30 : 30, 0, 0, alignment === 'left' ? -30 : 30]);
+}
+
+const Callout: React.FC<CalloutProps> = ({ 
+  title, 
+  description, 
+  x, 
+  y, 
+  progress, 
+  range,
+  alignment 
+}) => {
+  // Smooth fade and slide in
+  const opacity = useTransform(progress, [range[0], range[0] + 0.1, range[1] - 0.1, range[1]], [0, 1, 1, 0]);
+  const translateX = useTransform(
+    progress, 
+    [range[0], range[0] + 0.1, range[1] - 0.1, range[1]], 
+    [alignment === 'left' ? -40 : 40, 0, 0, alignment === 'left' ? -20 : 20]
+  );
+  const scale = useTransform(
+    progress,
+    [range[0], range[0] + 0.1, range[1] - 0.1, range[1]],
+    [0.8, 1, 1, 0.9]
+  );
 
   return (
     <motion.div 
-      style={{ top: y, left: x, opacity, x: translateX }}
-      className={`absolute z-30 flex items-center gap-6 ${alignment === 'right' ? 'flex-row-reverse' : ''}`}
+      style={{ 
+        top: y, 
+        left: x, 
+        opacity, 
+        x: translateX,
+        scale
+      }}
+      className={`absolute z-30 flex items-center gap-4 ${alignment === 'right' ? 'flex-row-reverse' : ''}`}
     >
-      <div className="w-4 h-4 rounded-full bg-[#F9D067] shadow-[0_0_20px_rgba(249,208,103,0.8)] border-2 border-white"></div>
-      <div className={`max-w-[200px] ${alignment === 'right' ? 'text-right' : 'text-left'}`}>
-        <h4 className="text-white font-serif text-2xl font-black mb-1">{title}</h4>
-        <p className="text-white/60 text-xs font-bold uppercase tracking-widest leading-tight">{description}</p>
-      </div>
-      <div className={`h-[1px] bg-white/30 w-16 ${alignment === 'right' ? '-mr-6' : '-ml-6'}`}></div>
+      <motion.div 
+        style={{ scale: useTransform(progress, [range[0], range[0] + 0.1], [0, 1]) }}
+        className="w-3 h-3 rounded-full bg-[#F9D067] shadow-[0_0_15px_rgba(249,208,103,0.6)] border-2 border-white flex-shrink-0"
+      />
+      <motion.div 
+        style={{ opacity: useTransform(progress, [range[0], range[0] + 0.15], [0, 1]) }}
+        className={`max-w-[220px] ${alignment === 'right' ? 'text-right' : 'text-left'}`}
+      >
+        <h4 className="text-white font-serif text-xl md:text-2xl font-bold mb-1.5 leading-tight">{title}</h4>
+        <p className="text-white/70 text-xs font-medium tracking-wide leading-relaxed">{description}</p>
+      </motion.div>
+      <motion.div 
+        style={{ 
+          scaleX: useTransform(progress, [range[0], range[0] + 0.1], [0, 1]),
+          opacity: useTransform(progress, [range[0], range[0] + 0.1], [0, 0.4])
+        }}
+        className={`h-[1px] bg-white/40 w-12 ${alignment === 'right' ? '-mr-4' : '-ml-4'}`}
+      />
     </motion.div>
   );
 };
@@ -36,119 +74,179 @@ const ProductDive: React.FC = () => {
     offset: ["start start", "end end"]
   });
 
-  const smoothProgress = useSpring(scrollYProgress, { stiffness: 45, damping: 20 });
+  // Ultra-smooth spring for premium feel
+  const smoothProgress = useSpring(scrollYProgress, { 
+    stiffness: 50, 
+    damping: 25,
+    mass: 0.5
+  });
 
-  // Main bottle transformations
-  const bottleScale = useTransform(smoothProgress, [0, 0.8, 1], [0.8, 4, 12]);
-  const bottleY = useTransform(smoothProgress, [0, 1], ["0%", "20%"]);
-  const bottleOpacity = useTransform(smoothProgress, [0, 0.1, 0.9, 1], [0, 1, 1, 0]);
+  // Phase 1: Product appears (0 - 0.15)
+  const productInitialOpacity = useTransform(smoothProgress, [0, 0.1], [0, 1]);
+  const productInitialScale = useTransform(smoothProgress, [0, 0.15], [0.6, 1]);
+
+  // Phase 2: Product zooms in smoothly (0.15 - 0.7)
+  const productZoomScale = useTransform(smoothProgress, [0.15, 0.7], [1, 3.5]);
+  const productZoomY = useTransform(smoothProgress, [0.15, 0.7], ["0%", "10%"]);
   
-  // Background text parallax
-  const bgTextY = useTransform(smoothProgress, [0, 1], [100, -200]);
-  const bgTextOpacity = useTransform(smoothProgress, [0, 0.5, 0.8], [0.05, 0.1, 0]);
+  // Combined scale for smooth transition
+  const finalScale = useTransform(
+    smoothProgress,
+    [0, 0.15, 0.7],
+    [0.6, 1, 3.5]
+  );
 
-  // Background color shift
-  const bgColor = useTransform(smoothProgress, [0, 0.5, 1], ["#F5F2ED", "#1a1a1a", "#2D4F3E"]);
+  // Product opacity - stays visible during zoom, fades at end
+  const productOpacity = useTransform(
+    smoothProgress,
+    [0, 0.1, 0.85, 1],
+    [0, 1, 1, 0]
+  );
+
+  // Background transitions - very subtle
+  const bgColor = useTransform(
+    smoothProgress,
+    [0, 0.3, 0.7, 1],
+    ["#F5F2ED", "#F5F2ED", "#1a1a1a", "#2D4F3E"]
+  );
+
+  // Subtle background text (very minimal)
+  const bgTextOpacity = useTransform(
+    smoothProgress,
+    [0, 0.2, 0.5],
+    [0, 0.03, 0]
+  );
+  const bgTextY = useTransform(smoothProgress, [0, 0.5], [0, -100]);
+
+  // Intro text fade
+  const introOpacity = useTransform(smoothProgress, [0, 0.15, 0.25], [1, 1, 0]);
+  const introY = useTransform(smoothProgress, [0, 0.25], [0, -30]);
+
+  // Final message
+  const finalOpacity = useTransform(smoothProgress, [0.75, 0.85], [0, 1]);
+  const finalScale = useTransform(smoothProgress, [0.75, 0.85], [0.95, 1]);
+  const finalY = useTransform(smoothProgress, [0.75, 0.85], [20, 0]);
 
   return (
-    <section ref={sectionRef} className="relative h-[500vh]">
+    <section ref={sectionRef} className="relative h-[400vh]">
+      {/* Pinned container - stays in view during scroll */}
       <motion.div 
         style={{ backgroundColor: bgColor }}
-        className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden transition-colors duration-500"
+        className="sticky top-0 h-screen w-full flex items-center justify-center overflow-hidden"
       >
-        {/* Large background typography */}
+        {/* Very subtle background typography */}
         <motion.div 
           style={{ y: bgTextY, opacity: bgTextOpacity }}
           className="absolute inset-0 flex items-center justify-center pointer-events-none"
         >
-          <span className="font-serif text-[30vw] font-black text-[#F47C3E] select-none whitespace-nowrap">
+          <span className="font-serif text-[25vw] font-black text-[#F47C3E]/20 select-none whitespace-nowrap">
             RAW POTENCY
           </span>
         </motion.div>
 
-        {/* Central Product Image (The Bottle) */}
+        {/* Central Product Image - The Star */}
         <motion.div 
           style={{ 
-            scale: bottleScale, 
-            y: bottleY,
-            opacity: bottleOpacity
+            scale: finalScale,
+            y: productZoomY,
+            opacity: productOpacity
           }}
-          className="relative z-20 w-[300px] md:w-[450px] aspect-[1/2] flex items-center justify-center"
+          className="relative z-20 w-[280px] md:w-[400px] aspect-[1/2] flex items-center justify-center"
         >
-          {/* We'll use a stylized bottle-shaped container with a high-res image */}
-          <div className="w-full h-full relative group">
+          <div className="w-full h-full relative">
             <img 
               src="https://images.unsplash.com/photo-1615485240384-552e40d70bad?q=80&w=1200&auto=format&fit=crop" 
               alt="Jamu Jiva Signature Bottle"
-              className="w-full h-full object-cover rounded-[3rem] shadow-2xl border-4 border-white/10"
+              className="w-full h-full object-cover rounded-[2.5rem] shadow-2xl border-2 border-white/20"
             />
-            <div className="absolute inset-0 rounded-[3rem] bg-gradient-to-tr from-black/20 to-transparent"></div>
+            <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-tr from-black/10 to-transparent"></div>
           </div>
         </motion.div>
 
-        {/* Dynamic Story Overlays */}
-        <div className="absolute inset-0 z-30 pointer-events-none max-w-7xl mx-auto px-6">
-          <motion.div 
-            style={{ opacity: useTransform(smoothProgress, [0, 0.1, 0.2], [0, 1, 0]) }}
-            className="absolute top-1/2 left-0 -translate-y-1/2"
-          >
-            <h3 className="font-serif text-5xl md:text-7xl font-black text-[#F47C3E] mb-4">ENGINEERED <br /> BY NATURE.</h3>
-            <p className="text-[#2D4F3E] font-bold tracking-widest uppercase text-sm">Scroll to dismantle the ritual</p>
-          </motion.div>
+        {/* Intro Message - appears first */}
+        <motion.div 
+          style={{ opacity: introOpacity, y: introY }}
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-10 text-center pointer-events-none"
+        >
+          <h3 className="font-serif text-4xl md:text-6xl font-bold text-[#2D4F3E] mb-3">
+            ENGINEERED BY NATURE.
+          </h3>
+          <p className="text-[#2D4F3E]/70 font-medium tracking-wide text-sm uppercase">
+            Scroll to explore
+          </p>
+        </motion.div>
 
-          {/* Callouts pinned to scroll points */}
+        {/* Callouts - appear progressively during zoom */}
+        <div className="absolute inset-0 z-30 pointer-events-none max-w-7xl mx-auto px-6">
           <Callout 
             title="Curcumin Gold" 
             description="Pure Central Javanese turmeric, extracted without high heat to preserve bio-compounds." 
-            x="15%" 
-            y="35%" 
+            x="12%" 
+            y="30%" 
             progress={smoothProgress} 
-            range={[0.2, 0.35]} 
+            range={[0.25, 0.45]} 
             alignment="left"
           />
 
           <Callout 
             title="Cold-Press Ritual" 
             description="Zero-oxygen extraction ensures no oxidation of flavor or medicine." 
-            x="60%" 
+            x="65%" 
             y="25%" 
             progress={smoothProgress} 
-            range={[0.4, 0.55]} 
+            range={[0.35, 0.55]} 
             alignment="right"
           />
 
           <Callout 
             title="Bio-Available" 
             description="A pinch of Javanese long pepper triples the absorption of our key ingredients." 
-            x="20%" 
+            x="18%" 
+            y="70%" 
+            progress={smoothProgress} 
+            range={[0.45, 0.65]} 
+            alignment="left"
+          />
+
+          <Callout 
+            title="Ancient Wisdom" 
+            description="Formulated with the knowledge of traditional Mbok Jamu healers." 
+            x="70%" 
             y="65%" 
             progress={smoothProgress} 
-            range={[0.6, 0.75]} 
-            alignment="left"
+            range={[0.55, 0.75]} 
+            alignment="right"
           />
         </div>
 
-        {/* Macro Transition (Final Phase) */}
+        {/* Final Message - appears as zoom completes */}
         <motion.div 
-          style={{ opacity: useTransform(smoothProgress, [0.8, 0.9], [0, 1]) }}
-          className="absolute inset-0 bg-[#2D4F3E] flex items-center justify-center p-12"
+          style={{ 
+            opacity: finalOpacity,
+            scale: finalScale,
+            y: finalY
+          }}
+          className="absolute inset-0 bg-[#2D4F3E] flex items-center justify-center p-12 z-40"
         >
-          <div className="max-w-3xl text-center">
+          <div className="max-w-4xl text-center">
             <motion.span 
-              style={{ y: useTransform(smoothProgress, [0.8, 1], [50, 0]) }}
-              className="text-[#F9D067] font-black tracking-[0.4em] uppercase text-sm mb-8 block"
+              style={{ opacity: useTransform(smoothProgress, [0.75, 0.8], [0, 1]) }}
+              className="text-[#F9D067] font-bold tracking-[0.3em] uppercase text-xs mb-6 block"
             >
               The Science of Spirit
             </motion.span>
             <motion.h2 
-              style={{ scale: useTransform(smoothProgress, [0.8, 1], [0.9, 1]) }}
-              className="font-serif text-5xl md:text-9xl font-black text-white leading-tight mb-8"
+              style={{ opacity: useTransform(smoothProgress, [0.8, 0.85], [0, 1]) }}
+              className="font-serif text-4xl md:text-8xl font-bold text-white leading-tight mb-6"
             >
               ROOTS <br /> REFINED.
             </motion.h2>
-            <p className="text-white/70 text-xl md:text-3xl font-medium leading-relaxed">
-              We took the wisdom of the Mbok Jamu and the rigor of modern science to create the perfect 4oz tonic. 
-            </p>
+            <motion.p 
+              style={{ opacity: useTransform(smoothProgress, [0.85, 0.9], [0, 1]) }}
+              className="text-white/80 text-lg md:text-2xl font-light leading-relaxed max-w-2xl mx-auto"
+            >
+              We took the wisdom of the Mbok Jamu and the rigor of modern science to create the perfect 4oz tonic.
+            </motion.p>
           </div>
         </motion.div>
       </motion.div>
