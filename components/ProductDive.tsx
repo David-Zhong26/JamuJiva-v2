@@ -124,7 +124,7 @@ const ProductDive: React.FC = () => {
 
   // Final message
   const finalOpacity = useTransform(smoothProgress, [0.75, 0.85], [0, 1]);
-  const finalScale = useTransform(smoothProgress, [0.75, 0.85], [0.95, 1]);
+  const finalMessageScale = useTransform(smoothProgress, [0.75, 0.85], [0.95, 1]);
   const finalY = useTransform(smoothProgress, [0.75, 0.85], [20, 0]);
 
   return (
@@ -223,7 +223,7 @@ const ProductDive: React.FC = () => {
         <motion.div 
           style={{ 
             opacity: finalOpacity,
-            scale: finalScale,
+            scale: finalMessageScale,
             y: finalY
           }}
           className="absolute inset-0 bg-[#2D4F3E] flex items-center justify-center p-12 z-40"
