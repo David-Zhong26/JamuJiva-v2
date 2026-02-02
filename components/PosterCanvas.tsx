@@ -2,8 +2,10 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Send, ChevronDown } from 'lucide-react';
+import cupImage from '../materials/cup.png';
 
 interface PosterCanvasProps {
+  sectionRef: React.RefObject<HTMLElement>;
   posterUrl: string;
   isGenerating: boolean;
   email: string;
@@ -13,6 +15,7 @@ interface PosterCanvasProps {
 }
 
 const PosterCanvas: React.FC<PosterCanvasProps> = ({ 
+  sectionRef,
   posterUrl, 
   isGenerating, 
   email, 
@@ -21,14 +24,20 @@ const PosterCanvas: React.FC<PosterCanvasProps> = ({
   joined 
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  // Track the section's scroll progress over its full 200vh height
+  // This makes the animation span the entire scroll distance of the section
   const { scrollYProgress } = useScroll({
-    target: containerRef,
+    target: sectionRef,
     offset: ["start start", "end start"]
   });
 
-  const textY = useTransform(scrollYProgress, [0, 1], [0, 200]);
-  const imageScale = useTransform(scrollYProgress, [0, 1], [1, 1.1]);
-  const opacity = useTransform(scrollYProgress, [0.7, 1], [1, 0]);
+  // More gradual transitions - spread over longer scroll distance
+  // Text moves more slowly
+  const textY = useTransform(scrollYProgress, [0, 1], [0, 150]);
+  // Image scales more gradually from 1 to 1.3 (more zoom)
+  const imageScale = useTransform(scrollYProgress, [0, 0.8, 1], [1, 1.2, 1.4]);
+  // Opacity fades more gradually, starting later
+  const opacity = useTransform(scrollYProgress, [0.5, 0.9, 1], [1, 0.5, 0]);
 
   return (
     <div 
@@ -37,10 +46,9 @@ const PosterCanvas: React.FC<PosterCanvasProps> = ({
     >
       <motion.div style={{ scale: imageScale, opacity }} className="absolute inset-0 z-0">
         <img 
-          src={posterUrl} 
-          alt="Jamu Lifestyle" 
-          crossOrigin="anonymous"
-          className={`w-full h-full object-cover transition-opacity duration-1000 ${isGenerating ? 'opacity-40 grayscale blur-sm' : 'opacity-100'}`}
+          src={cupImage} 
+          alt="Jamu Cup" 
+          className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#2D4F3E]/80 via-transparent to-black/30"></div>
       </motion.div>

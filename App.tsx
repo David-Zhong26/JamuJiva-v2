@@ -19,6 +19,7 @@ const App: React.FC = () => {
   const [email, setEmail] = useState('');
   const [joined, setJoined] = useState(false);
   const currentImageIndex = useRef(0);
+  const heroSectionRef = useRef<HTMLElement>(null);
 
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
@@ -60,15 +61,18 @@ const App: React.FC = () => {
       <Navbar />
       
       <main>
-        <section id="hero" className="min-h-screen flex items-center justify-center p-4 md:p-8">
-          <PosterCanvas 
-            posterUrl={posterUrl} 
-            isGenerating={isGenerating} 
-            email={email}
-            setEmail={setEmail}
-            onJoin={handleJoin}
-            joined={joined}
-          />
+        <section ref={heroSectionRef} id="hero" className="h-[200vh] flex items-center justify-center p-4 md:p-8">
+          <div className="sticky top-0 w-full flex items-center justify-center py-8">
+            <PosterCanvas 
+              sectionRef={heroSectionRef}
+              posterUrl={posterUrl} 
+              isGenerating={isGenerating} 
+              email={email}
+              setEmail={setEmail}
+              onJoin={handleJoin}
+              joined={joined}
+            />
+          </div>
         </section>
 
         <ProductDive />
