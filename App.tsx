@@ -29,17 +29,20 @@ const App: React.FC = () => {
   });
 
   const generateNewPoster = useCallback(() => {
+    // Cycle through the 3 background images with smooth transition
     setIsGenerating(true);
-    // Cycle through the 3 background images
-    currentImageIndex.current = (currentImageIndex.current + 1) % backgroundImages.length;
-    setPosterUrl(backgroundImages[currentImageIndex.current]);
-    setIsGenerating(false);
+    // Small delay to allow fade transition
+    setTimeout(() => {
+      currentImageIndex.current = (currentImageIndex.current + 1) % backgroundImages.length;
+      setPosterUrl(backgroundImages[currentImageIndex.current]);
+      setIsGenerating(false);
+    }, 500); // Half second fade transition
   }, [backgroundImages]);
 
-  // Auto-cycle every 25 seconds
+  // Auto-cycle every 4 seconds (4000ms)
   useEffect(() => {
     generateNewPoster();
-    const interval = setInterval(generateNewPoster, 25000);
+    const interval = setInterval(generateNewPoster, 4000);
     return () => clearInterval(interval);
   }, [generateNewPoster]);
 
@@ -61,8 +64,8 @@ const App: React.FC = () => {
       <Navbar />
       
       <main>
-        <section ref={heroSectionRef} id="hero" className="h-[200vh] flex items-center justify-center p-2 md:p-4">
-          <div className="sticky top-0 w-full flex items-center justify-center py-4">
+        <section ref={heroSectionRef} id="hero" className="h-[200vh] flex items-center justify-center pt-0 pb-2 md:pb-4">
+          <div className="sticky top-0 w-full flex items-center justify-center pt-0 pb-2">
             <PosterCanvas 
               sectionRef={heroSectionRef}
               posterUrl={posterUrl} 

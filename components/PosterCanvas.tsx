@@ -44,10 +44,12 @@ const PosterCanvas: React.FC<PosterCanvasProps> = ({
       className="relative w-full max-w-7xl aspect-[4/5] md:aspect-[16/9] bg-white rounded-[2.5rem] md:rounded-[3.5rem] shadow-2xl overflow-hidden border-[8px] md:border-[16px] border-white group"
     >
       <motion.div style={{ scale: imageScale, opacity }} className="absolute inset-0 z-0">
-        <img 
+        <motion.img 
           src={posterUrl} 
           alt="Jamu Lifestyle" 
           className="w-full h-full object-cover"
+          animate={{ opacity: isGenerating ? 0.3 : 1 }}
+          transition={{ duration: 0.5, ease: "easeInOut" }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#2D4F3E]/80 via-transparent to-black/30"></div>
       </motion.div>

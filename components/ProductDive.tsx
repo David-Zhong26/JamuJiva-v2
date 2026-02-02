@@ -22,16 +22,20 @@ const Callout: React.FC<CalloutProps> = ({
   range,
   alignment 
 }) => {
-  // Smooth fade and slide in
-  const opacity = useTransform(progress, [range[0], range[0] + 0.1, range[1] - 0.1, range[1]], [0, 1, 1, 0]);
+  // Wider, smoother fade and slide in - each callout visible for longer
+  const rangeWidth = range[1] - range[0];
+  const fadeInEnd = range[0] + rangeWidth * 0.2; // Fade in over first 20% of range
+  const fadeOutStart = range[1] - rangeWidth * 0.2; // Fade out over last 20% of range
+  
+  const opacity = useTransform(progress, [range[0], fadeInEnd, fadeOutStart, range[1]], [0, 1, 1, 0]);
   const translateX = useTransform(
     progress, 
-    [range[0], range[0] + 0.1, range[1] - 0.1, range[1]], 
+    [range[0], fadeInEnd, fadeOutStart, range[1]], 
     [alignment === 'left' ? -40 : 40, 0, 0, alignment === 'left' ? -20 : 20]
   );
   const scale = useTransform(
     progress,
-    [range[0], range[0] + 0.1, range[1] - 0.1, range[1]],
+    [range[0], fadeInEnd, fadeOutStart, range[1]],
     [0.8, 1, 1, 0.9]
   );
 
@@ -47,11 +51,11 @@ const Callout: React.FC<CalloutProps> = ({
       className={`absolute z-30 flex items-center gap-4 ${alignment === 'right' ? 'flex-row-reverse' : ''}`}
     >
       <motion.div 
-        style={{ scale: useTransform(progress, [range[0], range[0] + 0.1], [0, 1]) }}
+        style={{ scale: useTransform(progress, [range[0], fadeInEnd], [0, 1]) }}
         className="w-3 h-3 rounded-full bg-[#F9D067] shadow-[0_0_15px_rgba(249,208,103,0.6)] border-2 border-white flex-shrink-0"
       />
       <motion.div 
-        style={{ opacity: useTransform(progress, [range[0], range[0] + 0.15], [0, 1]) }}
+        style={{ opacity: useTransform(progress, [range[0], fadeInEnd], [0, 1]) }}
         className={`max-w-[220px] ${alignment === 'right' ? 'text-right' : 'text-left'}`}
       >
         <h4 className="text-white font-serif text-xl md:text-2xl font-bold mb-1.5 leading-tight">{title}</h4>
@@ -59,8 +63,8 @@ const Callout: React.FC<CalloutProps> = ({
       </motion.div>
       <motion.div 
         style={{ 
-          scaleX: useTransform(progress, [range[0], range[0] + 0.1], [0, 1]),
-          opacity: useTransform(progress, [range[0], range[0] + 0.1], [0, 0.4])
+          scaleX: useTransform(progress, [range[0], fadeInEnd], [0, 1]),
+          opacity: useTransform(progress, [range[0], fadeInEnd], [0, 0.4])
         }}
         className={`h-[1px] bg-white/40 w-12 ${alignment === 'right' ? '-mr-4' : '-ml-4'}`}
       />
@@ -82,54 +86,54 @@ const ProductDive: React.FC = () => {
     mass: 0.5
   });
 
-  // Phase 1: Product appears (0 - 0.15)
-  const productInitialOpacity = useTransform(smoothProgress, [0, 0.1], [0, 1]);
-  const productInitialScale = useTransform(smoothProgress, [0, 0.15], [0.6, 1]);
+  // Phase 1: Product appears (0 - 0.08) - slower
+  const productInitialOpacity = useTransform(smoothProgress, [0, 0.05], [0, 1]);
+  const productInitialScale = useTransform(smoothProgress, [0, 0.08], [0.6, 1]);
 
-  // Phase 2: Product zooms in smoothly (0.15 - 0.7)
-  const productZoomScale = useTransform(smoothProgress, [0.15, 0.7], [1, 3.5]);
-  const productZoomY = useTransform(smoothProgress, [0.15, 0.7], ["0%", "10%"]);
+  // Phase 2: Product zooms in smoothly (0.08 - 0.6) - much longer zoom phase
+  const productZoomScale = useTransform(smoothProgress, [0.08, 0.6], [1, 3.5]);
+  const productZoomY = useTransform(smoothProgress, [0.08, 0.6], ["0%", "10%"]);
   
   // Combined scale for smooth transition
   const finalScale = useTransform(
     smoothProgress,
-    [0, 0.15, 0.7],
+    [0, 0.08, 0.6],
     [0.6, 1, 3.5]
   );
 
   // Product opacity - stays visible during zoom, fades at end
   const productOpacity = useTransform(
     smoothProgress,
-    [0, 0.1, 0.85, 1],
+    [0, 0.05, 0.85, 1],
     [0, 1, 1, 0]
   );
 
-  // Background transitions - very subtle
+  // Background transitions - very subtle, spread over longer scroll
   const bgColor = useTransform(
     smoothProgress,
-    [0, 0.3, 0.7, 1],
+    [0, 0.2, 0.6, 1],
     ["#F5F2ED", "#F5F2ED", "#1a1a1a", "#2D4F3E"]
   );
 
   // Subtle background text (very minimal)
   const bgTextOpacity = useTransform(
     smoothProgress,
-    [0, 0.2, 0.5],
+    [0, 0.15, 0.4],
     [0, 0.03, 0]
   );
-  const bgTextY = useTransform(smoothProgress, [0, 0.5], [0, -100]);
+  const bgTextY = useTransform(smoothProgress, [0, 0.4], [0, -100]);
 
-  // Intro text fade
-  const introOpacity = useTransform(smoothProgress, [0, 0.15, 0.25], [1, 1, 0]);
-  const introY = useTransform(smoothProgress, [0, 0.25], [0, -30]);
+  // Intro text fade - stays longer
+  const introOpacity = useTransform(smoothProgress, [0, 0.08, 0.15], [1, 1, 0]);
+  const introY = useTransform(smoothProgress, [0, 0.15], [0, -30]);
 
-  // Final message
-  const finalOpacity = useTransform(smoothProgress, [0.75, 0.85], [0, 1]);
-  const finalMessageScale = useTransform(smoothProgress, [0.75, 0.85], [0.95, 1]);
-  const finalY = useTransform(smoothProgress, [0.75, 0.85], [20, 0]);
+  // Final message - appears later
+  const finalOpacity = useTransform(smoothProgress, [0.85, 0.92], [0, 1]);
+  const finalMessageScale = useTransform(smoothProgress, [0.85, 0.92], [0.95, 1]);
+  const finalY = useTransform(smoothProgress, [0.85, 0.92], [20, 0]);
 
   return (
-    <section ref={sectionRef} className="relative h-[400vh]">
+    <section ref={sectionRef} className="relative h-[1000vh]">
       {/* Pinned container - stays in view during scroll */}
       <motion.div 
         style={{ backgroundColor: bgColor }}
@@ -177,7 +181,7 @@ const ProductDive: React.FC = () => {
           </p>
         </motion.div>
 
-        {/* Callouts - appear progressively during zoom */}
+        {/* Callouts - appear progressively during zoom, each with wider range for slower pacing */}
         <div className="absolute inset-0 z-30 pointer-events-none max-w-7xl mx-auto px-6">
           <Callout 
             title="Curcumin Gold" 
@@ -185,7 +189,7 @@ const ProductDive: React.FC = () => {
             x="12%" 
             y="30%" 
             progress={smoothProgress} 
-            range={[0.25, 0.45]} 
+            range={[0.15, 0.35]} 
             alignment="left"
           />
 
@@ -195,7 +199,7 @@ const ProductDive: React.FC = () => {
             x="65%" 
             y="25%" 
             progress={smoothProgress} 
-            range={[0.35, 0.55]} 
+            range={[0.3, 0.5]} 
             alignment="right"
           />
 
@@ -215,7 +219,7 @@ const ProductDive: React.FC = () => {
             x="70%" 
             y="65%" 
             progress={smoothProgress} 
-            range={[0.55, 0.75]} 
+            range={[0.6, 0.8]} 
             alignment="right"
           />
         </div>
@@ -231,19 +235,19 @@ const ProductDive: React.FC = () => {
         >
           <div className="max-w-4xl text-center">
             <motion.span 
-              style={{ opacity: useTransform(smoothProgress, [0.75, 0.8], [0, 1]) }}
+              style={{ opacity: useTransform(smoothProgress, [0.85, 0.88], [0, 1]) }}
               className="text-[#F9D067] font-bold tracking-[0.3em] uppercase text-xs mb-6 block"
             >
               The Science of Spirit
             </motion.span>
             <motion.h2 
-              style={{ opacity: useTransform(smoothProgress, [0.8, 0.85], [0, 1]) }}
+              style={{ opacity: useTransform(smoothProgress, [0.88, 0.91], [0, 1]) }}
               className="font-serif text-4xl md:text-8xl font-bold text-white leading-tight mb-6"
             >
               ROOTS <br /> REFINED.
             </motion.h2>
             <motion.p 
-              style={{ opacity: useTransform(smoothProgress, [0.85, 0.9], [0, 1]) }}
+              style={{ opacity: useTransform(smoothProgress, [0.91, 0.95], [0, 1]) }}
               className="text-white/80 text-lg md:text-2xl font-light leading-relaxed max-w-2xl mx-auto"
             >
               We took the wisdom of the Mbok Jamu and the rigor of modern science to create the perfect 4oz tonic.
