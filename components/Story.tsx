@@ -1,6 +1,9 @@
 
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import image1 from '../materials/1.png';
+import image2 from '../materials/2.png';
+import image3 from '../materials/3.png';
 
 const Story: React.FC = () => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -43,12 +46,16 @@ const Story: React.FC = () => {
         <div className="flex-1 relative">
           <motion.div 
             style={{ opacity: img1Opacity }}
-            className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1543083115-638c32cd3d58?q=80&w=1200&auto=format&fit=crop')] bg-cover bg-center"
-          />
+            className="absolute inset-0 bg-cover bg-center"
+          >
+            <img src={image1} alt="Jamu Story" className="w-full h-full object-cover" />
+          </motion.div>
           <motion.div 
             style={{ opacity: img2Opacity, scale: img2Scale }}
-            className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1596040033229-a9821ebd058d?q=80&w=1200&auto=format&fit=crop')] bg-cover bg-center"
-          />
+            className="absolute inset-0 bg-cover bg-center"
+          >
+            <img src={image2} alt="Jamu Story" className="w-full h-full object-cover" />
+          </motion.div>
           <div className="absolute inset-0 bg-black/20" />
         </div>
       </div>
