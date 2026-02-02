@@ -1,6 +1,7 @@
 
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
+import cupImage from '../materials/cup.png';
 
 interface CalloutProps {
   title: string;
@@ -155,7 +156,7 @@ const ProductDive: React.FC = () => {
         >
           <div className="w-full h-full relative">
             <img 
-              src="https://images.unsplash.com/photo-1615485240384-552e40d70bad?q=80&w=1200&auto=format&fit=crop" 
+              src={cupImage} 
               alt="Jamu Jiva Signature Bottle"
               className="w-full h-full object-cover rounded-[2.5rem] shadow-2xl border-2 border-white/20"
             />

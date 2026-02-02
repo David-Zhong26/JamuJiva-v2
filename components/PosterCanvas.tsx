@@ -2,7 +2,6 @@
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Send, ChevronDown } from 'lucide-react';
-import cupImage from '../materials/cup.png';
 
 interface PosterCanvasProps {
   sectionRef: React.RefObject<HTMLElement>;
@@ -46,8 +45,8 @@ const PosterCanvas: React.FC<PosterCanvasProps> = ({
     >
       <motion.div style={{ scale: imageScale, opacity }} className="absolute inset-0 z-0">
         <img 
-          src={cupImage} 
-          alt="Jamu Cup" 
+          src={posterUrl} 
+          alt="Jamu Lifestyle" 
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#2D4F3E]/80 via-transparent to-black/30"></div>

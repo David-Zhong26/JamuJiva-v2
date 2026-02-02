@@ -61,8 +61,8 @@ const App: React.FC = () => {
       <Navbar />
       
       <main>
-        <section ref={heroSectionRef} id="hero" className="h-[200vh] flex items-center justify-center p-4 md:p-8">
-          <div className="sticky top-0 w-full flex items-center justify-center py-8">
+        <section ref={heroSectionRef} id="hero" className="h-[200vh] flex items-center justify-center p-2 md:p-4">
+          <div className="sticky top-0 w-full flex items-center justify-center py-4">
             <PosterCanvas 
               sectionRef={heroSectionRef}
               posterUrl={posterUrl} 
