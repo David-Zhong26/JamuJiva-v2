@@ -1,7 +1,7 @@
-
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { Send, ChevronDown } from 'lucide-react';
+import demoJivaBottle from '../materials/demo jiva removed.png';
 
 interface PosterCanvasProps {
   sectionRef: React.RefObject<HTMLElement>;
@@ -33,10 +33,13 @@ const PosterCanvas: React.FC<PosterCanvasProps> = ({
   // More gradual transitions - spread over longer scroll distance
   // Text moves more slowly
   const textY = useTransform(scrollYProgress, [0, 1], [0, 150]);
-  // Image scales more gradually from 1 to 1.3 (more zoom)
+  // Background image scales on scroll
   const imageScale = useTransform(scrollYProgress, [0, 0.8, 1], [1, 1.2, 1.4]);
   // Opacity fades more gradually, starting later
   const opacity = useTransform(scrollYProgress, [0.5, 0.9, 1], [1, 0.5, 0]);
+  // Bottle animates independently - scales up, floats, slight parallax
+  const bottleScale = useTransform(scrollYProgress, [0, 0.5, 1], [0.9, 1.1, 1.3]);
+  const bottleY = useTransform(scrollYProgress, [0, 0.5, 1], [0, -20, -60]);
 
   return (
     <div 
@@ -46,12 +49,26 @@ const PosterCanvas: React.FC<PosterCanvasProps> = ({
       <motion.div style={{ scale: imageScale, opacity }} className="absolute inset-0 z-0">
         <motion.img 
           src={posterUrl} 
-          alt="Jamu Lifestyle" 
+          alt="Jamu Jiva Lifestyle" 
           className="w-full h-full object-cover"
           animate={{ opacity: isGenerating ? 0.3 : 1 }}
           transition={{ duration: 0.5, ease: "easeInOut" }}
         />
         <div className="absolute inset-0 bg-gradient-to-t from-[#2D4F3E]/80 via-transparent to-black/30"></div>
+      </motion.div>
+
+      {/* Bottle overlay - animated independently for hero transitions */}
+      <motion.div
+        style={{ scale: bottleScale, y: bottleY }}
+        className="absolute inset-0 z-[5] flex items-center justify-center pointer-events-none"
+      >
+        <motion.img
+          src={demoJivaBottle}
+          alt="Jamu Jiva Bottle"
+          className="w-[35%] min-w-[180px] max-w-[320px] h-auto object-contain drop-shadow-2xl"
+          animate={{ y: [0, -8, 0] }}
+          transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+        />
       </motion.div>
 
       <div className="relative z-10 w-full h-full flex flex-col justify-between p-8 md:p-16 text-white">

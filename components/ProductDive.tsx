@@ -1,7 +1,7 @@
 
 import React, { useRef } from 'react';
 import { motion, useScroll, useTransform, useSpring } from 'framer-motion';
-import cupImage from '../materials/cup.png';
+import bottleImage from '../materials/demo jiva removed.png';
 
 interface CalloutProps {
   title: string;
@@ -160,9 +160,9 @@ const ProductDive: React.FC = () => {
         >
           <div className="w-full h-full relative">
             <img 
-              src={cupImage} 
+              src={bottleImage} 
               alt="Jamu Jiva Signature Bottle"
-              className="w-full h-full object-cover rounded-[2.5rem] shadow-2xl border-2 border-white/20"
+              className="w-full h-full object-contain rounded-[2.5rem] shadow-2xl drop-shadow-2xl"
             />
             <div className="absolute inset-0 rounded-[2.5rem] bg-gradient-to-tr from-black/10 to-transparent"></div>
           </div>

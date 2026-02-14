@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import Navbar from './components/Navbar';
 import PosterCanvas from './components/PosterCanvas';
 import ProductDive from './components/ProductDive';
@@ -8,17 +8,13 @@ import Story from './components/Story';
 import WaitlistSection from './components/WaitlistSection';
 import Footer from './components/Footer';
 import { motion, useScroll, useSpring } from "framer-motion";
-import image1 from './materials/1.png';
-import image2 from './materials/2.png';
-import image3 from './materials/3.png';
+import demoJiva from './materials/demo jiva.jpg';
 
 const App: React.FC = () => {
-  const backgroundImages = [image1, image2, image3];
-  const [posterUrl, setPosterUrl] = useState<string>(image1);
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [posterUrl] = useState<string>(demoJiva);
+  const [isGenerating] = useState(false);
   const [email, setEmail] = useState('');
   const [joined, setJoined] = useState(false);
-  const currentImageIndex = useRef(0);
   const heroSectionRef = useRef<HTMLElement>(null);
 
   const { scrollYProgress } = useScroll();
@@ -27,24 +23,6 @@ const App: React.FC = () => {
     damping: 30,
     restDelta: 0.001
   });
-
-  const generateNewPoster = useCallback(() => {
-    // Cycle through the 3 background images with smooth transition
-    setIsGenerating(true);
-    // Small delay to allow fade transition
-    setTimeout(() => {
-      currentImageIndex.current = (currentImageIndex.current + 1) % backgroundImages.length;
-      setPosterUrl(backgroundImages[currentImageIndex.current]);
-      setIsGenerating(false);
-    }, 500); // Half second fade transition
-  }, [backgroundImages]);
-
-  // Auto-cycle every 4 seconds (4000ms)
-  useEffect(() => {
-    generateNewPoster();
-    const interval = setInterval(generateNewPoster, 4000);
-    return () => clearInterval(interval);
-  }, [generateNewPoster]);
 
   const handleJoin = (e: React.FormEvent) => {
     e.preventDefault();
