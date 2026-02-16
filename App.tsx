@@ -1,17 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Navbar from './components/Navbar';
-import { HeroSection } from './components/HeroSection';
+import PosterCanvas from './components/PosterCanvas';
+import ProductDive from './components/ProductDive';
 import Features from './components/Features';
-import { IngredientsSection } from './components/IngredientsSection';
 import Story from './components/Story';
 import WaitlistSection from './components/WaitlistSection';
-import { FAQSection } from './components/FAQSection';
 import Footer from './components/Footer';
 import { motion, useScroll, useSpring } from 'framer-motion';
+import demoJiva from './materials/demo jiva.jpg';
 
 const App: React.FC = () => {
+  const [posterUrl] = useState<string>(demoJiva);
+  const [isGenerating] = useState(false);
   const [email, setEmail] = useState('');
   const [joined, setJoined] = useState(false);
+  const heroSectionRef = useRef<HTMLElement>(null);
 
   const { scrollYProgress } = useScroll();
   const scaleX = useSpring(scrollYProgress, {
@@ -36,12 +39,25 @@ const App: React.FC = () => {
       />
       <Navbar />
       <main>
-        <HeroSection email={email} setEmail={setEmail} onJoin={handleJoin} joined={joined} />
+        <section ref={heroSectionRef} id="hero" className="h-[200vh] flex items-start justify-center pt-0 pb-2 md:pb-4">
+          <div className="sticky top-0 w-full flex items-center justify-center pt-0 pb-2">
+            <PosterCanvas
+              sectionRef={heroSectionRef}
+              posterUrl={posterUrl}
+              isGenerating={isGenerating}
+              email={email}
+              setEmail={setEmail}
+              onJoin={handleJoin}
+              joined={joined}
+            />
+          </div>
+        </section>
+
+        <ProductDive />
+
         <Features />
-        <IngredientsSection />
         <Story />
         <WaitlistSection email={email} setEmail={setEmail} onJoin={handleJoin} joined={joined} />
-        <FAQSection />
       </main>
       <Footer />
     </div>
