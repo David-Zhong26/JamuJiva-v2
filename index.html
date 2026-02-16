@@ -10,12 +10,18 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,700;9..144,900&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        body {
+        html, body {
             font-family: 'Inter', sans-serif;
             background-color: #F5F2ED;
             margin: 0;
+            padding: 0;
             overflow-x: hidden;
+            overflow-y: auto;
+            min-height: 100%;
             color: #2D4F3E;
+        }
+        #root {
+            min-height: 100vh;
         }
         .font-serif {
             font-family: 'Fraunces', serif;
@@ -25,9 +31,9 @@
             position: fixed;
             inset: 0;
             background-image: url("https://www.transparenttextures.com/patterns/p6.png");
-            opacity: 0.12;
+            opacity: 0.06;
             pointer-events: none;
-            z-index: 100;
+            z-index: 0;
         }
         /* Custom scrollbar for premium feel */
         ::-webkit-scrollbar {
@@ -44,18 +50,6 @@
             scroll-behavior: smooth;
         }
     </style>
-<script type="importmap">
-{
-  "imports": {
-    "react": "https://esm.sh/react@19.0.0",
-    "react/": "https://esm.sh/react@19.0.0/",
-    "react-dom": "https://esm.sh/react-dom@19.0.0",
-    "react-dom/": "https://esm.sh/react-dom@19.0.0/",
-    "framer-motion": "https://esm.sh/framer-motion@11.11.11?external=react,react-dom",
-    "lucide-react": "https://esm.sh/lucide-react@0.454.0?external=react"
-  }
-}
-</script>
 <link rel="stylesheet" href="/index.css">
 </head>
 <body class="grainy-texture">
