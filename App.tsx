@@ -1,12 +1,9 @@
 import React, { useState } from 'react';
 import Navbar from './components/Navbar';
 import ScrollStory from './components/ScrollStory';
+import { Lazy3D } from './components/three/Lazy3D';
 import Footer from './components/Footer';
 import { motion, useScroll, useSpring } from "framer-motion";
-
-// 3D section temporarily disabled - was causing crashes (large bundle + WebGL)
-// Re-enable when ready: lazy load and wrap in Suspense
-// const ScrollExperience = lazy(() => import('./components/three/ScrollExperience').then((m) => ({ default: m.ScrollExperience })));
 
 const App: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -36,6 +33,7 @@ const App: React.FC = () => {
       <Navbar />
       <main className="pt-0">
         <ScrollStory email={email} setEmail={setEmail} onJoin={handleJoin} joined={joined} />
+        <Lazy3D email={email} setEmail={setEmail} onJoin={handleJoin} joined={joined} />
       </main>
       <Footer />
     </div>

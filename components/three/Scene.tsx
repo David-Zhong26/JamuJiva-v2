@@ -18,20 +18,22 @@ import bottleModel from '../../materials/Jiva bottle.glb?url';
 
 interface BottleModelProps {
   modelRef: React.MutableRefObject<THREE.Group | null>;
+  onLoaded?: () => void;
 }
 
-function BottleModel({ modelRef }: BottleModelProps) {
+function BottleModel({ modelRef, onLoaded }: BottleModelProps) {
   const { scene } = useGLTF(bottleModel);
   const groupRef = useRef<THREE.Group>(null);
 
   React.useEffect(() => {
     if (groupRef.current) {
       modelRef.current = groupRef.current;
+      onLoaded?.();
     }
     return () => {
       modelRef.current = null;
     };
-  }, [modelRef]);
+  }, [modelRef, onLoaded]);
 
   // Clone to avoid mutating the cached scene
   const clonedScene = scene.clone();
@@ -51,19 +53,31 @@ function BottleModel({ modelRef }: BottleModelProps) {
 interface SceneProps {
   modelRef: React.MutableRefObject<THREE.Group | null>;
   cameraRef: React.MutableRefObject<THREE.PerspectiveCamera | null>;
+  onInvalidateReady?: (invalidate: () => void) => void;
+  onModelLoaded?: () => void;
 }
 
-export function Scene({ modelRef, cameraRef }: SceneProps) {
+function InvalidateBridge({ onReady }: { onReady: (invalidate: () => void) => void }) {
+  const { invalidate } = useThree();
+  useEffect(() => {
+    onReady(invalidate);
+  }, [invalidate, onReady]);
+  return null;
+}
+
+export function Scene({ modelRef, cameraRef, onInvalidateReady, onModelLoaded }: SceneProps) {
   return (
     <Canvas
       gl={{ antialias: true, alpha: true }}
       camera={{ position: [0, 0, 8], fov: 45 }}
-      dpr={[1, 2]}
+      dpr={[1, 1.5]}
+      frameloop="demand"
     >
       <CameraRefSetter cameraRef={cameraRef} />
-      {/* Soft studio lighting + subtle environment */}
+      {onInvalidateReady && <InvalidateBridge onReady={onInvalidateReady} />}
+      {/* Soft studio lighting - shadows disabled for performance */}
       <ambientLight intensity={0.4} />
-      <directionalLight position={[5, 5, 5]} intensity={1.2} castShadow />
+      <directionalLight position={[5, 5, 5]} intensity={1.2} />
       <directionalLight position={[-3, 2, 3]} intensity={0.6} />
       <directionalLight position={[0, -2, 2]} intensity={0.3} />
       <pointLight position={[0, 3, 4]} intensity={0.8} />
@@ -79,7 +93,7 @@ export function Scene({ modelRef, cameraRef }: SceneProps) {
           </mesh>
         }
       >
-        <BottleModel modelRef={modelRef} />
+        <BottleModel modelRef={modelRef} onLoaded={onModelLoaded} />
       </Suspense>
     </Canvas>
   );
