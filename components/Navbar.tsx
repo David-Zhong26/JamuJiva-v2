@@ -7,7 +7,7 @@ const Navbar: React.FC = () => {
     <motion.nav 
       initial={{ y: -100 }}
       animate={{ y: 0 }}
-      className="fixed top-0 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-5xl pt-2 md:pt-3"
+      className="fixed top-0 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-5xl pt-0"
     >
       <div className="bg-white/80 backdrop-blur-xl border border-white/40 px-8 py-4 rounded-full shadow-2xl flex justify-between items-center">
         <div className="flex items-center">
