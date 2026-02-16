@@ -98,7 +98,7 @@ const ScrollStory: React.FC<ScrollStoryProps> = ({ email, setEmail, onJoin, join
             <img
               src={demoJivaBottle}
               alt="Jamu Jiva"
-              className="w-[88%] min-w-[420px] max-w-[900px] h-auto object-contain drop-shadow-2xl"
+              className="w-[95%] min-w-[600px] max-w-[1100px] h-auto object-contain drop-shadow-2xl"
             />
           </motion.div>
 
@@ -170,30 +170,36 @@ const ScrollStory: React.FC<ScrollStoryProps> = ({ email, setEmail, onJoin, join
             </div>
           </motion.div>
 
-          {/* ——— Ingredients: bottle spins, 3 pics pop from center, then disappear ——— */}
+          {/* ——— Ingredients: bottle spins, 3 pics pop out from center (radiating outward), then disappear ——— */}
           <motion.div
             style={{ opacity: ingredientsContainerOpacity }}
             className="absolute inset-0 z-[8] flex items-center justify-center pointer-events-none"
           >
-            <div className="flex items-center justify-center gap-12 md:gap-20 max-w-5xl px-8">
+            <div className="relative w-full max-w-4xl h-[70%] flex items-center justify-center">
               {[
-                { title: 'Turmeric', desc: 'Pure Central Javanese', color: '#F9D067', scaleVal: ingredientsPopScale1 },
-                { title: 'Ginger', desc: 'Cold-press ritual', color: '#F47C3E', scaleVal: ingredientsPopScale2 },
-                { title: 'Long Pepper', desc: 'Bio-available blend', color: '#2D4F3E', scaleVal: ingredientsPopScale3 },
+                { title: 'Turmeric', desc: 'Pure Central Javanese', color: '#F9D067', angle: -120, scaleVal: ingredientsPopScale1 },
+                { title: 'Ginger', desc: 'Cold-press ritual', color: '#F47C3E', angle: 0, scaleVal: ingredientsPopScale2 },
+                { title: 'Long Pepper', desc: 'Bio-available blend', color: '#2D4F3E', angle: 120, scaleVal: ingredientsPopScale3 },
               ].map((item) => (
                 <motion.div
                   key={item.title}
-                  style={{ scale: item.scaleVal, opacity: ingredientsCardsOpacity }}
-                  className="flex flex-col items-center text-center origin-center"
+                  style={{
+                    scale: item.scaleVal,
+                    opacity: ingredientsCardsOpacity,
+                    position: 'absolute',
+                    rotate: item.angle,
+                    y: -110,
+                  }}
+                  className="origin-center flex flex-col items-center"
                 >
                   <div
-                    className="w-24 h-24 md:w-32 md:h-32 rounded-2xl border-2 border-white/50 flex flex-col items-center justify-center shadow-2xl backdrop-blur-sm"
-                    style={{ backgroundColor: `${item.color}dd` }}
+                    className="flex flex-col items-center justify-center rounded-2xl border-2 border-white/50 shadow-2xl backdrop-blur-sm w-24 h-24 md:w-28 md:h-28"
+                    style={{ backgroundColor: `${item.color}dd`, transform: `rotate(${-item.angle}deg)` }}
                   >
-                    <span className="font-serif text-3xl md:text-4xl font-black text-white">{item.title.slice(0, 1)}</span>
-                    <span className="font-bold text-white/90 text-xs mt-1 uppercase tracking-wider">{item.title}</span>
+                    <span className="font-serif text-2xl md:text-3xl font-black text-white">{item.title.slice(0, 1)}</span>
+                    <span className="font-bold text-white/90 text-xs mt-0.5 uppercase tracking-wider">{item.title}</span>
                   </div>
-                  <p className="text-white/90 text-sm font-medium mt-3 max-w-[120px]">{item.desc}</p>
+                  <p className="text-white/90 text-sm font-medium mt-2 max-w-[100px] text-center" style={{ transform: `rotate(${-item.angle}deg)` }}>{item.desc}</p>
                 </motion.div>
               ))}
             </div>
