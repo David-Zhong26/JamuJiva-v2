@@ -65,7 +65,7 @@ const PosterCanvas: React.FC<PosterCanvasProps> = ({
         <motion.img
           src={demoJivaBottle}
           alt="Jamu Jiva Bottle"
-          className="w-[35%] min-w-[180px] max-w-[320px] h-auto object-contain drop-shadow-2xl"
+          className="w-[58%] min-w-[300px] max-w-[520px] h-auto object-contain drop-shadow-2xl"
           animate={{ y: [0, -8, 0] }}
           transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
         />

@@ -42,7 +42,7 @@ const App: React.FC = () => {
       <Navbar />
       
       <main>
-        <section ref={heroSectionRef} id="hero" className="h-[200vh] flex items-center justify-center pt-0 pb-2 md:pb-4">
+        <section ref={heroSectionRef} id="hero" className="h-[200vh] flex items-start justify-center pt-0 pb-2 md:pb-4">
           <div className="sticky top-0 w-full flex items-center justify-center pt-0 pb-2">
             <PosterCanvas 
               sectionRef={heroSectionRef}
