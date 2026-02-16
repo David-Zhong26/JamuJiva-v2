@@ -23,36 +23,47 @@ const ScrollStory: React.FC<ScrollStoryProps> = ({ email, setEmail, onJoin, join
 
   const smoothProgress = useTransform(scrollYProgress, (v) => easeInOutCubic(v));
 
+  // ——— Section boundaries (slower scroll, more hold time) ———
+  // Hero: 0–0.18 hold, 0.18–0.26 transition | Benefits: 0.26–0.42 hold, 0.42–0.50 transition
+  // Ingredients: 0.50–0.72 hold (spin, pop, hold, disappear), 0.72–0.80 transition
+  // Culture: 0.80–0.90 hold, 0.90–0.96 transition | Flavors: 0.96–1.00
+
   // ——— Bottle transforms (main storyline element) ———
-  const bottleOpacity = useTransform(smoothProgress, [0, 0.08, 0.25, 0.45, 0.65, 0.80, 0.95, 1], [0, 1, 1, 1, 1, 1, 0.6, 0]);
-  const bottleScale = useTransform(smoothProgress, [0, 0.2, 0.25, 0.45, 0.65, 0.80, 0.95, 1], [0.8, 1.05, 1.05, 1, 1, 0.9, 0.85, 0.8]);
-  const bottleX = useTransform(smoothProgress, [0, 0.25, 0.45, 0.65, 0.80, 1], [0, 0, -180, 0, 180, 0]);
-  const bottleY = useTransform(smoothProgress, [0, 0.25, 0.45, 0.65, 0.80, 1], [0, 25, 0, 0, 0, 0]);
-  const bottleZIndex = useTransform(smoothProgress, [0, 0.12, 0.25, 0.45, 0.65, 0.80, 1], [5, 30, 30, 20, 20, 15, 5]);
+  // Hero: starts at bottom (stuck on bg), moves UP as user scrolls
+  // At top: moves down + left into Benefits
+  const bottleOpacity = useTransform(smoothProgress, [0, 0.06, 0.18, 0.50, 0.72, 0.90, 0.98, 1], [0, 1, 1, 1, 1, 1, 0.6, 0]);
+  const bottleScale = useTransform(smoothProgress, [0, 0.15, 0.18, 0.50, 0.72, 0.90, 0.98, 1], [0.85, 1.1, 1.1, 1.05, 1.05, 0.95, 0.85, 0.75]);
+  const bottleX = useTransform(smoothProgress, [0, 0.18, 0.26, 0.42, 0.50, 0.72, 0.80, 0.90, 1], [0, 0, -220, -220, 0, 0, 220, 220, 0]);
+  const bottleY = useTransform(smoothProgress, [0, 0.15, 0.26, 0.42, 0.50, 0.72, 0.80, 0.90, 1], [180, -40, 60, 60, 0, 0, 40, 40, 20]);
+  const bottleRotate = useTransform(smoothProgress, [0.48, 0.54], [0, 360]);
+  const bottleZIndex = useTransform(smoothProgress, [0, 0.10, 0.18, 0.50, 0.72, 0.90, 1], [5, 30, 30, 25, 25, 15, 5]);
 
   // ——— Background ———
-  const bgImageOpacity = useTransform(smoothProgress, [0, 0.25, 0.3], [1, 0.3, 0]);
+  const bgImageOpacity = useTransform(smoothProgress, [0, 0.26, 0.32], [1, 0.25, 0]);
   const bgColor = useTransform(
     smoothProgress,
-    [0, 0.25, 0.45, 0.65, 0.80, 1],
+    [0, 0.26, 0.50, 0.72, 0.90, 1],
     ['#2D4F3E', '#2D4F3E', '#F5F2ED', '#2D4F3E', '#F5F2ED', '#F5F2ED']
   );
 
   // ——— Section content opacities ———
-  const heroOpacity = useTransform(smoothProgress, [0, 0.05, 0.2, 0.28], [1, 1, 1, 0]);
-  const benefitsOpacity = useTransform(smoothProgress, [0.22, 0.28, 0.42, 0.48], [0, 1, 1, 0]);
-  const benefitsSlideX = useTransform(smoothProgress, [0.22, 0.28], [60, 0]);
-  const ingredientsOpacity = useTransform(smoothProgress, [0.42, 0.48, 0.62, 0.68], [0, 1, 1, 0]);
-  const ingredientsScale = useTransform(smoothProgress, [0.42, 0.48], [0.9, 1]);
-  const cultureOpacity = useTransform(smoothProgress, [0.62, 0.68, 0.78, 0.84], [0, 1, 1, 0]);
-  const cultureSlideX = useTransform(smoothProgress, [0.62, 0.68], [-60, 0]);
-  const flavorsOpacity = useTransform(smoothProgress, [0.78, 0.84, 0.92], [0, 1, 1]);
-  const flavorsScale = useTransform(smoothProgress, [0.78, 0.84], [0.95, 1]);
+  const heroOpacity = useTransform(smoothProgress, [0, 0.05, 0.15, 0.26], [1, 1, 1, 0]);
+  const benefitsOpacity = useTransform(smoothProgress, [0.22, 0.28, 0.40, 0.50], [0, 1, 1, 0]);
+  const benefitsSlideX = useTransform(smoothProgress, [0.22, 0.30], [80, 0]);
+  const ingredientsContainerOpacity = useTransform(smoothProgress, [0.48, 0.54, 0.68, 0.72], [0, 1, 1, 0]);
+  const ingredientsPopScale1 = useTransform(smoothProgress, [0.54, 0.58], [0, 1]);
+  const ingredientsPopScale2 = useTransform(smoothProgress, [0.56, 0.60], [0, 1]);
+  const ingredientsPopScale3 = useTransform(smoothProgress, [0.58, 0.62], [0, 1]);
+  const ingredientsCardsOpacity = useTransform(smoothProgress, [0.54, 0.58, 0.66, 0.70], [0, 1, 1, 0]);
+  const cultureOpacity = useTransform(smoothProgress, [0.74, 0.82, 0.88, 0.96], [0, 1, 1, 0]);
+  const cultureSlideX = useTransform(smoothProgress, [0.74, 0.82], [-80, 0]);
+  const flavorsOpacity = useTransform(smoothProgress, [0.92, 0.98, 1], [0, 1, 1]);
+  const flavorsScale = useTransform(smoothProgress, [0.92, 0.98], [0.95, 1]);
 
   return (
     <>
-      {/* Scroll wrapper: 500vh for enough scroll distance */}
-      <div ref={scrollRef} className="relative" style={{ height: '500vh' }}>
+      {/* Scroll wrapper: 900vh for longer sections and slower transitions */}
+      <div ref={scrollRef} className="relative" style={{ height: '900vh' }}>
         {/* Sticky viewport */}
         <div className="sticky top-0 h-screen w-full overflow-hidden">
           {/* Background */}
@@ -78,6 +89,7 @@ const ScrollStory: React.FC<ScrollStoryProps> = ({ email, setEmail, onJoin, join
               x: bottleX,
               y: bottleY,
               scale: bottleScale,
+              rotate: bottleRotate,
               opacity: bottleOpacity,
               zIndex: bottleZIndex,
             }}
@@ -86,7 +98,7 @@ const ScrollStory: React.FC<ScrollStoryProps> = ({ email, setEmail, onJoin, join
             <img
               src={demoJivaBottle}
               alt="Jamu Jiva"
-              className="w-[50%] min-w-[280px] max-w-[480px] h-auto object-contain drop-shadow-2xl"
+              className="w-[72%] min-w-[380px] max-w-[680px] h-auto object-contain drop-shadow-2xl"
             />
           </motion.div>
 
@@ -158,30 +170,30 @@ const ScrollStory: React.FC<ScrollStoryProps> = ({ email, setEmail, onJoin, join
             </div>
           </motion.div>
 
-          {/* ——— Ingredients (0.45–0.65) ——— */}
+          {/* ——— Ingredients: bottle spins, 3 pics pop from center, then disappear ——— */}
           <motion.div
-            style={{ opacity: ingredientsOpacity, scale: ingredientsScale }}
+            style={{ opacity: ingredientsContainerOpacity }}
             className="absolute inset-0 z-[8] flex items-center justify-center pointer-events-none"
           >
-            <div className="grid grid-cols-3 gap-8 md:gap-16 max-w-4xl px-8">
+            <div className="flex items-center justify-center gap-12 md:gap-20 max-w-5xl px-8">
               {[
-                { title: 'Turmeric', desc: 'Pure Central Javanese', color: '#F9D067' },
-                { title: 'Ginger', desc: 'Cold-press ritual', color: '#F47C3E' },
-                { title: 'Long Pepper', desc: 'Bio-available blend', color: '#2D4F3E' },
-              ].map((item, i) => (
+                { title: 'Turmeric', desc: 'Pure Central Javanese', color: '#F9D067', scaleVal: ingredientsPopScale1 },
+                { title: 'Ginger', desc: 'Cold-press ritual', color: '#F47C3E', scaleVal: ingredientsPopScale2 },
+                { title: 'Long Pepper', desc: 'Bio-available blend', color: '#2D4F3E', scaleVal: ingredientsPopScale3 },
+              ].map((item) => (
                 <motion.div
                   key={item.title}
-                  initial={{ opacity: 0, y: 20 }}
-                  className="text-center"
+                  style={{ scale: item.scaleVal, opacity: ingredientsCardsOpacity }}
+                  className="flex flex-col items-center text-center origin-center"
                 >
                   <div
-                    className="w-20 h-20 md:w-24 md:h-24 rounded-full mx-auto mb-4 border-2 border-white/40 flex items-center justify-center text-white font-black text-sm"
-                    style={{ backgroundColor: `${item.color}40` }}
+                    className="w-24 h-24 md:w-32 md:h-32 rounded-2xl border-2 border-white/50 flex flex-col items-center justify-center shadow-2xl backdrop-blur-sm"
+                    style={{ backgroundColor: `${item.color}dd` }}
                   >
-                    {item.title.slice(0, 1)}
+                    <span className="font-serif text-3xl md:text-4xl font-black text-white">{item.title.slice(0, 1)}</span>
+                    <span className="font-bold text-white/90 text-xs mt-1 uppercase tracking-wider">{item.title}</span>
                   </div>
-                  <h3 className="font-serif text-xl md:text-2xl font-bold text-white">{item.title}</h3>
-                  <p className="text-white/70 text-sm mt-1">{item.desc}</p>
+                  <p className="text-white/90 text-sm font-medium mt-3 max-w-[120px]">{item.desc}</p>
                 </motion.div>
               ))}
             </div>
