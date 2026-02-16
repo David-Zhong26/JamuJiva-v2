@@ -1,10 +1,13 @@
-import React, { useRef, useLayoutEffect, useState, useCallback } from 'react';
+import React, { useRef, useLayoutEffect } from 'react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Scene } from './Scene';
+import { Scene, preloadBottleModel } from './Scene';
 import * as THREE from 'three';
 
 gsap.registerPlugin(ScrollTrigger);
+
+// Preload model on module load
+preloadBottleModel();
 
 interface IngredientCard {
   title: string;
@@ -33,81 +36,108 @@ export function ScrollExperience({ email = '', setEmail = () => {}, onJoin, join
   const canvasRef = useRef<HTMLDivElement>(null);
   const modelRef = useRef<THREE.Group | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
-  const invalidateRef = useRef<(() => void) | null>(null);
-  const [modelReady, setModelReady] = useState(false);
 
+  // Ref for ingredient cards (for GSAP animation)
   const ingredientCardsRef = useRef<HTMLDivElement[]>([]);
   const ingredientsContainerRef = useRef<HTMLDivElement>(null);
   const ctaRef = useRef<HTMLDivElement>(null);
   const section1TextRef = useRef<HTMLDivElement>(null);
 
-  const handleInvalidateReady = useCallback((invalidate: () => void) => {
-    invalidateRef.current = invalidate;
-  }, []);
-
-  const handleModelReady = useCallback(() => {
-    setModelReady(true);
-  }, []);
-
   useLayoutEffect(() => {
-    if (!modelReady) return;
+    const ctx = gsap.context(() => {
+      const scrollWrapper = scrollWrapperRef.current;
+      if (!scrollWrapper) return;
 
-    const scrollWrapper = scrollWrapperRef.current;
-    const canvas = canvasRef.current;
-    if (!scrollWrapper || !canvas) return;
+      // Wait for R3F to set camera ref (model may load async)
+      const tick = () => {
+        requestAnimationFrame(() => {
+          if (!cameraRef.current) {
+            tick();
+            return;
+          }
 
-    let ctx: ReturnType<typeof gsap.context> | null = null;
-
-    const setup = () => {
-      requestAnimationFrame(() => {
-        if (!cameraRef.current) {
-          requestAnimationFrame(setup);
-          return;
-        }
-
-        ctx = gsap.context(() => {
-          const invalidate = () => invalidateRef.current?.();
-
+          // Timeline for camera and model
           const tl = gsap.timeline({
             scrollTrigger: {
               trigger: scrollWrapper,
               start: 'top top',
               end: 'bottom bottom',
               scrub: 1.2,
-              pin: canvas,
-              onUpdate: invalidate,
+              pin: canvasRef.current,
             },
           });
 
-          tl.to(cameraRef.current!.position, { z: 6, x: 0.3, y: 0.2, ease: 'power2.inOut' }, 0);
+          // Section 1: Initial view - zoom in, slight orbit
+          tl.to(
+            cameraRef.current.position,
+            {
+              z: 6,
+              x: 0.3,
+              y: 0.2,
+              duration: 1,
+              ease: 'power2.inOut',
+            },
+            0
+          );
 
+          // Section 2: Model rotates to hero angle (if loaded)
           const model = modelRef.current;
           if (model) {
-            tl.to(model.rotation, { y: Math.PI * 0.25, ease: 'power2.inOut' }, 0.5);
+            tl.to(model.rotation, { y: Math.PI * 0.25, duration: 1, ease: 'power2.inOut' }, 0.5);
           }
 
+          // Section 3: Ingredient cards pop in
           if (ingredientsContainerRef.current) {
-            tl.fromTo(ingredientsContainerRef.current, { opacity: 0 }, { opacity: 1, ease: 'power2.out' }, 1.5);
+            tl.fromTo(
+              ingredientsContainerRef.current,
+              { opacity: 0 },
+              { opacity: 1, duration: 0.5, ease: 'power2.out' },
+              1.5
+            );
           }
           ingredientCardsRef.current.forEach((card, i) => {
             if (card) {
               tl.fromTo(
                 card,
-                { opacity: 0, scale: 0 },
-                { opacity: 1, scale: 1, ease: 'back.out(1.4)' },
+                { opacity: 0, scale: 0, y: 0 },
+                {
+                  opacity: 1,
+                  scale: 1,
+                  y: -20,
+                  duration: 0.4,
+                  ease: 'back.out(1.4)',
+                  delay: 0.1 * i,
+                },
                 1.8 + i * 0.1
               );
             }
           });
 
-          tl.to(cameraRef.current!.position, { z: 9, x: 0, y: 0, ease: 'power2.inOut' }, 2.8);
+          // Section 4: Camera pulls back, model settles, CTA
+          tl.to(
+            cameraRef.current.position,
+            {
+              z: 9,
+              x: 0,
+              y: 0,
+              duration: 1,
+              ease: 'power2.inOut',
+            },
+            2.8
+          );
           if (model) {
-            tl.to(model.rotation, { y: Math.PI * 0.15, ease: 'power2.inOut' }, 2.8);
+            tl.to(model.rotation, { y: Math.PI * 0.15, duration: 1, ease: 'power2.inOut' }, 2.8);
           }
           if (ctaRef.current) {
-            tl.fromTo(ctaRef.current, { opacity: 0, y: 30 }, { opacity: 1, y: 0, ease: 'power2.out' }, 3.2);
+            tl.fromTo(
+              ctaRef.current,
+              { opacity: 0, y: 30 },
+              { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out' },
+              3.2
+            );
           }
 
+          // Text slides
           if (section1TextRef.current) {
             gsap.fromTo(
               section1TextRef.current,
@@ -120,24 +150,17 @@ export function ScrollExperience({ email = '', setEmail = () => {}, onJoin, join
                   start: 'top top',
                   end: '30% top',
                   scrub: 1,
-                  onUpdate: invalidate,
                 },
               }
             );
           }
-        }, scrollWrapper);
-      });
-    };
+        });
+      };
+      tick();
+    }, scrollWrapper);
 
-    setup();
-
-    return () => {
-      ctx?.revert();
-      ScrollTrigger.getAll().forEach((t) => {
-        if (t.trigger === scrollWrapper) t.kill();
-      });
-    };
-  }, [modelReady]);
+    return () => ctx.revert();
+  }, []);
 
   return (
     <div ref={scrollWrapperRef} className="relative" style={{ height: '400vh' }}>
@@ -147,12 +170,7 @@ export function ScrollExperience({ email = '', setEmail = () => {}, onJoin, join
         className="sticky top-0 left-0 w-full h-screen bg-[#F5F2ED]"
         style={{ zIndex: 0 }}
       >
-        <Scene
-          modelRef={modelRef}
-          cameraRef={cameraRef}
-          onInvalidateReady={handleInvalidateReady}
-          onModelLoaded={handleModelReady}
-        />
+        <Scene modelRef={modelRef} cameraRef={cameraRef} />
         {/* Overlay sections - positioned over the canvas (sticky with it) */}
         <div className="pointer-events-none absolute inset-0 z-10 flex flex-col justify-between p-8 md:p-16">
         {/* Section 1: Intro text (left) */}
