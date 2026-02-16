@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import Navbar from './components/Navbar';
-import ScrollStory from './components/ScrollStory';
-import { Lazy3D } from './components/three/Lazy3D';
+import { HeroSection } from './components/HeroSection';
+import Features from './components/Features';
+import { IngredientsSection } from './components/IngredientsSection';
+import Story from './components/Story';
+import WaitlistSection from './components/WaitlistSection';
+import { FAQSection } from './components/FAQSection';
 import Footer from './components/Footer';
-import { motion, useScroll, useSpring } from "framer-motion";
+import { motion, useScroll, useSpring } from 'framer-motion';
 
 const App: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -31,9 +35,13 @@ const App: React.FC = () => {
         style={{ scaleX }}
       />
       <Navbar />
-      <main className="pt-0">
-        <ScrollStory email={email} setEmail={setEmail} onJoin={handleJoin} joined={joined} />
-        <Lazy3D email={email} setEmail={setEmail} onJoin={handleJoin} joined={joined} />
+      <main>
+        <HeroSection email={email} setEmail={setEmail} onJoin={handleJoin} joined={joined} />
+        <Features />
+        <IngredientsSection />
+        <Story />
+        <WaitlistSection email={email} setEmail={setEmail} onJoin={handleJoin} joined={joined} />
+        <FAQSection />
       </main>
       <Footer />
     </div>
