@@ -23,38 +23,42 @@ const ScrollStory: React.FC<ScrollStoryProps> = ({ email, setEmail, onJoin, join
 
   const smoothProgress = useTransform(scrollYProgress, (v) => easeInOutCubic(v));
 
-  // ——— Section boundaries (wider hold time so middle sections are visible) ———
-  // Hero: 0–0.12 | Benefits: 0.12–0.32 | Ingredients: 0.32–0.58 (bottle center + rotate) | Culture: 0.58–0.82 | Flavors: 0.82–1.00
+  // ——— Section boundaries (slower scroll, more hold time) ———
+  // Hero: 0–0.10 hold | Hero→Benefits: 0.10–0.18 bottle shrinks + moves left
+  // Benefits: 0.18–0.38 hold (bottle floats left, dark green bg) | 0.38–0.48 transition
+  // Ingredients: 0.48–0.70 hold | 0.70–0.78 transition | Culture: 0.78–0.90 | Flavors: 0.90–1.00
 
   // ——— Bottle transforms (main storyline element) ———
-  const bottleOpacity = useTransform(smoothProgress, [0, 0.04, 0.12, 0.32, 0.58, 0.82, 0.96, 1], [0, 1, 1, 1, 1, 1, 0.6, 0]);
-  const bottleScale = useTransform(smoothProgress, [0, 0.08, 0.12, 0.32, 0.58, 0.82, 0.96, 1], [0.9, 1.15, 0.9, 1.05, 1.05, 0.95, 0.85, 0.75]);
-  const bottleX = useTransform(smoothProgress, [0, 0.08, 0.12, 0.30, 0.32, 0.58, 0.65, 0.82, 1], [0, 0, -220, -220, 0, 0, 220, 220, 0]);
-  const bottleY = useTransform(smoothProgress, [0, 0.12, 0.32, 0.58, 0.65, 0.82, 1], [0, 0, 0, 0, 40, 40, 20]);
-  const bottleRotate = useTransform(smoothProgress, [0.34, 0.42], [0, 360]);
-  const bottleZIndex = useTransform(smoothProgress, [0, 0.06, 0.12, 0.32, 0.58, 0.82, 1], [5, 30, 30, 25, 25, 15, 5]);
+  // Hero: appears in center, covers background bottle. Then shrinks + moves left into Benefits.
+  // Benefits: floats on left (hold). Dark green bg holds for reading.
+  const bottleOpacity = useTransform(smoothProgress, [0, 0.05, 0.18, 0.48, 0.70, 0.90, 0.98, 1], [0, 1, 1, 1, 1, 1, 0.6, 0]);
+  const bottleScale = useTransform(smoothProgress, [0, 0.10, 0.18, 0.48, 0.70, 0.90, 0.98, 1], [0.9, 1.15, 0.9, 1.05, 1.05, 0.95, 0.85, 0.75]);
+  const bottleX = useTransform(smoothProgress, [0, 0.10, 0.18, 0.38, 0.48, 0.70, 0.78, 0.90, 1], [0, 0, -220, -220, 0, 0, 220, 220, 0]);
+  const bottleY = useTransform(smoothProgress, [0, 0.18, 0.48, 0.70, 0.78, 0.90, 1], [0, 0, 0, 0, 40, 40, 20]);
+  const bottleRotate = useTransform(smoothProgress, [0.46, 0.52], [0, 360]);
+  const bottleZIndex = useTransform(smoothProgress, [0, 0.08, 0.18, 0.48, 0.70, 0.90, 1], [5, 30, 30, 25, 25, 15, 5]);
 
   // ——— Background ———
-  const bgImageOpacity = useTransform(smoothProgress, [0, 0.12, 0.18], [1, 0.2, 0]);
+  const bgImageOpacity = useTransform(smoothProgress, [0, 0.18, 0.24], [1, 0.2, 0]);
   const bgColor = useTransform(
     smoothProgress,
-    [0, 0.12, 0.30, 0.32, 0.58, 0.65, 0.82, 1],
+    [0, 0.18, 0.38, 0.48, 0.70, 0.78, 0.90, 1],
     ['#2D4F3E', '#2D4F3E', '#2D4F3E', '#F5F2ED', '#2D4F3E', '#F5F2ED', '#F5F2ED', '#F5F2ED']
   );
 
-  // ——— Section content opacities (wider windows so middle doesn't vanish) ———
-  const heroOpacity = useTransform(smoothProgress, [0, 0.04, 0.10, 0.16], [1, 1, 1, 0]);
-  const benefitsOpacity = useTransform(smoothProgress, [0.10, 0.18, 0.26, 0.36], [0, 1, 1, 0]);
-  const benefitsSlideX = useTransform(smoothProgress, [0.10, 0.20], [80, 0]);
-  const ingredientsContainerOpacity = useTransform(smoothProgress, [0.28, 0.36, 0.50, 0.58], [0, 1, 1, 0]);
-  const ingredientsPopScale1 = useTransform(smoothProgress, [0.36, 0.42], [0, 1]);
-  const ingredientsPopScale2 = useTransform(smoothProgress, [0.38, 0.44], [0, 1]);
-  const ingredientsPopScale3 = useTransform(smoothProgress, [0.40, 0.46], [0, 1]);
-  const ingredientsCardsOpacity = useTransform(smoothProgress, [0.36, 0.42, 0.52, 0.58], [0, 1, 1, 0]);
-  const cultureOpacity = useTransform(smoothProgress, [0.54, 0.62, 0.76, 0.88], [0, 1, 1, 0]);
-  const cultureSlideX = useTransform(smoothProgress, [0.54, 0.66], [-80, 0]);
-  const flavorsOpacity = useTransform(smoothProgress, [0.78, 0.86, 1], [0, 1, 1]);
-  const flavorsScale = useTransform(smoothProgress, [0.78, 0.86], [0.95, 1]);
+  // ——— Section content opacities ———
+  const heroOpacity = useTransform(smoothProgress, [0, 0.05, 0.12, 0.20], [1, 1, 1, 0]);
+  const benefitsOpacity = useTransform(smoothProgress, [0.14, 0.22, 0.34, 0.48], [0, 1, 1, 0]);
+  const benefitsSlideX = useTransform(smoothProgress, [0.14, 0.24], [80, 0]);
+  const ingredientsContainerOpacity = useTransform(smoothProgress, [0.44, 0.52, 0.64, 0.70], [0, 1, 1, 0]);
+  const ingredientsPopScale1 = useTransform(smoothProgress, [0.52, 0.56], [0, 1]);
+  const ingredientsPopScale2 = useTransform(smoothProgress, [0.54, 0.58], [0, 1]);
+  const ingredientsPopScale3 = useTransform(smoothProgress, [0.56, 0.60], [0, 1]);
+  const ingredientsCardsOpacity = useTransform(smoothProgress, [0.52, 0.56, 0.62, 0.66], [0, 1, 1, 0]);
+  const cultureOpacity = useTransform(smoothProgress, [0.72, 0.80, 0.86, 0.96], [0, 1, 1, 0]);
+  const cultureSlideX = useTransform(smoothProgress, [0.72, 0.82], [-80, 0]);
+  const flavorsOpacity = useTransform(smoothProgress, [0.90, 0.96, 1], [0, 1, 1]);
+  const flavorsScale = useTransform(smoothProgress, [0.90, 0.96], [0.95, 1]);
 
   return (
     <>
@@ -94,7 +98,7 @@ const ScrollStory: React.FC<ScrollStoryProps> = ({ email, setEmail, onJoin, join
             <img
               src={demoJivaBottle}
               alt="Jamu Jiva"
-              className="w-[120%] min-w-[800px] max-w-[1300px] h-auto object-contain drop-shadow-2xl"
+              className="w-[95%] min-w-[600px] max-w-[1100px] h-auto object-contain drop-shadow-2xl"
             />
           </motion.div>
 
